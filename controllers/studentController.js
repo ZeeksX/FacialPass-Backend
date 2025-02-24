@@ -11,7 +11,6 @@ export const registerStudent = async (req, res) => {
     const {
       firstname,
       lastname,
-      middlename,
       matricNumber,
       department,
       email,

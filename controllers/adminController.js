@@ -5,24 +5,74 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+// Register a new admin
+export const registerAdmin = async (req, res) => {
+  try {
+    const {
+      firstname,
+      lastname,
+      staff_id,
+      rank,
+      position,
+      email,
+      office,
+      password,
+    } = req.body;
+
+    // Check if admin already exists by email or staff_id
+    const existingAdminByEmail = await Admin.findOne({ where: { email } });
+    const existingAdminByStaffId = await Admin.findOne({ where: { staff_id } });
+
+    if (existingAdminByEmail || existingAdminByStaffId) {
+      return res.status(400).json({ message: "Admin already exists" });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create admin
+    const admin = await Admin.create({
+      firstname,
+      lastname,
+      staff_id,
+      rank,
+      position,
+      email,
+      office,
+      password_hash: hashedPassword, // Use the correct field name from the model
+      role: "admin", // Explicitly set the role (though it defaults to "admin")
+    });
+
+    res
+      .status(201)
+      .json({ message: "Admin registered successfully", admin });
+  } catch (error) {
+    res.status(500).json({ message: "Error registering admin", error });
+  }
+};
+
 // Admin login
 export const loginAdmin = async (req, res) => {
   try {
-    const { staffId, password } = req.body;
+    const { email, password } = req.body; 
 
-    const admin = await Admin.findOne({ where: { staffId } });
+    // Find admin by email
+    const admin = await Admin.findOne({ where: { email } });
     if (!admin) return res.status(404).json({ message: "Admin not found" });
 
-    const isMatch = await bcrypt.compare(password, admin.password);
+    // Compare passwords
+    const isMatch = await bcrypt.compare(password, admin.password_hash);
     if (!isMatch)
       return res.status(401).json({ message: "Invalid credentials" });
 
+    // Generate JWT token
     const token = jwt.sign(
       { id: admin.id, role: "admin" },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
+    // Return success response
     res.json({ message: "Login successful", token, admin });
   } catch (error) {
     res.status(500).json({ message: "Error logging in", error });

@@ -8,6 +8,11 @@ export default (sequelize, DataTypes) => {
       email: { type: DataTypes.STRING, unique: true },
       facial_image: DataTypes.TEXT,
       password_hash: DataTypes.TEXT,
+      role: {
+        type: DataTypes.STRING,
+        defaultValue: "student", 
+        allowNull: false, 
+      },
     },
     { timestamps: true }
   );
