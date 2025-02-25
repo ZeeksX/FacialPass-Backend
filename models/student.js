@@ -8,7 +8,7 @@ export default (sequelize, DataTypes) => {
       department: DataTypes.STRING,
       email: { type: DataTypes.STRING, unique: true },
       facial_image: DataTypes.TEXT,
-      password_hash: DataTypes.TEXT,
+      password: DataTypes.TEXT,
       role: {
         type: DataTypes.STRING,
         defaultValue: "student", 
