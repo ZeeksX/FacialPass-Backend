@@ -12,9 +12,9 @@ export const registerStudent = async (req, res) => {
       firstname,
       lastname,
       matricNumber,
-      department,
       email,
       password,
+      facial_image
     } = req.body;
 
     // Check if student exists
@@ -43,34 +43,30 @@ export const registerStudent = async (req, res) => {
   }
 };
 
-
-// Student login with email and password
+// Student login
 export const loginStudent = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { matricNumber, password } = req.body;
 
-    // Find student by email
-    const student = await Student.findOne({ where: { email } });
+    const student = await Student.findOne({ where: { matricNumber } });
     if (!student) return res.status(404).json({ message: "Student not found" });
 
-    // Compare passwords
     const isMatch = await bcrypt.compare(password, student.password);
     if (!isMatch)
       return res.status(401).json({ message: "Invalid credentials" });
 
-    // Generate JWT token
     const token = jwt.sign(
       { id: student.id, role: "student" },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    // Return success response
     res.json({ message: "Login successful", token, student });
   } catch (error) {
     res.status(500).json({ message: "Error logging in", error });
   }
 };
+
 // Get student dashboard info
 export const getStudentDetails = async (req, res) => {
   try {

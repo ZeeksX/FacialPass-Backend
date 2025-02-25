@@ -5,6 +5,7 @@ export default (sequelize, DataTypes) => {
       firstname: DataTypes.STRING,
       lastname: DataTypes.STRING,
       matric_number: { type: DataTypes.STRING, unique: true },
+      department: DataTypes.STRING,
       email: { type: DataTypes.STRING, unique: true },
       facial_image: DataTypes.TEXT,
       password_hash: DataTypes.TEXT,
