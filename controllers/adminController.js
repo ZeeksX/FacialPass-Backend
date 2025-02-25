@@ -1,3 +1,4 @@
+// controllers/adminController.js
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Admin, Student, Course, StudentCourse } from "../models/index.js";
@@ -8,17 +9,7 @@ dotenv.config();
 // Register a new admin
 export const registerAdmin = async (req, res) => {
   try {
-    const {
-      firstname,
-      lastname,
-      staff_id,
-      rank,
-      position,
-      email,
-      office,
-      password,
-    } = req.body;
-
+    const { firstname, lastname, staff_id, email, office, password } = req.body;
     // Check if admin already exists by email or staff_id
     const existingAdminByEmail = await Admin.findOne({ where: { email } });
     const existingAdminByStaffId = await Admin.findOne({ where: { staff_id } });
@@ -35,17 +26,13 @@ export const registerAdmin = async (req, res) => {
       firstname,
       lastname,
       staff_id,
-      rank,
-      position,
       email,
       office,
       password_hash: hashedPassword, // Use the correct field name from the model
       role: "admin", // Explicitly set the role (though it defaults to "admin")
     });
 
-    res
-      .status(201)
-      .json({ message: "Admin registered successfully", admin });
+    res.status(201).json({ message: "Admin registered successfully", admin });
   } catch (error) {
     res.status(500).json({ message: "Error registering admin", error });
   }
@@ -54,7 +41,7 @@ export const registerAdmin = async (req, res) => {
 // Admin login
 export const loginAdmin = async (req, res) => {
   try {
-    const { email, password } = req.body; 
+    const { email, password } = req.body;
 
     // Find admin by email
     const admin = await Admin.findOne({ where: { email } });

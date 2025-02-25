@@ -1,5 +1,6 @@
-import { Sequelize } from "sequelize";
+import { Sequelize, DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
+
 import createStudentModel from "./student.js";
 import createAdminModel from "./admin.js";
 import createDepartmentModel from "./department.js";
@@ -8,17 +9,17 @@ import createStudentCourseModel from "./studentCourse.js";
 import createSemesterRegistrationModel from "./semesterRegistration.js";
 import createExamAuthenticationModel from "./examAuthentication.js";
 
-// Create models
-const Student = createStudentModel(sequelize, Sequelize);
-const Admin = createAdminModel(sequelize, Sequelize);
-const Department = createDepartmentModel(sequelize, Sequelize);
-const Course = createCourseModel(sequelize, Sequelize);
-const StudentCourse = createStudentCourseModel(sequelize, Sequelize);
+// Create models (pass only `sequelize` and `DataTypes`)
+const Student = createStudentModel(sequelize, DataTypes);
+const Admin = createAdminModel(sequelize, DataTypes);
+const Department = createDepartmentModel(sequelize, DataTypes);
+const Course = createCourseModel(sequelize, DataTypes);
+const StudentCourse = createStudentCourseModel(sequelize, DataTypes);
 const SemesterRegistration = createSemesterRegistrationModel(
   sequelize,
-  Sequelize
+  DataTypes
 );
-const ExamAuthentication = createExamAuthenticationModel(sequelize, Sequelize);
+const ExamAuthentication = createExamAuthenticationModel(sequelize, DataTypes);
 
 // Define relationships
 Department.hasMany(Student, { foreignKey: "department_id" });
@@ -45,7 +46,7 @@ SemesterRegistration.belongsTo(Student, { foreignKey: "student_id" });
 Student.hasMany(ExamAuthentication, { foreignKey: "student_id" });
 ExamAuthentication.belongsTo(Student, { foreignKey: "student_id" });
 
-// Export models and sequelize instance
+// Export models
 export {
   sequelize,
   Student,
