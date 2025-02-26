@@ -1,3 +1,4 @@
+//controllers/studentController.js
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Student, Course, StudentCourse } from "../models/index.js";
@@ -7,11 +8,18 @@ dotenv.config();
 
 // Register a new student with file upload
 export const registerStudent = async (req, res) => {
+  console.log(req.body); // Log the body to see what is being received
+  console.log(req.file); // Log the file to see if it is being received
   try {
-    const { firstname, lastname, department, matricNumber, email, password } =
-      req.body;
-
-    const facial_image = req.file; // Access the uploaded file
+    const {
+      firstname,
+      lastname,
+      department,
+      matricNumber,
+      email,
+      password,
+      facial_image, // Ensure this is being correctly parsed from req.body
+    } = req.body;
 
     // Check if student exists
     const existingStudent = await Student.findOne({ where: { matricNumber } });
@@ -29,7 +37,7 @@ export const registerStudent = async (req, res) => {
       matricNumber,
       department,
       email,
-      facial_image: facial_image ? facial_image.filename : null, // Save only the filename
+      facial_image, // Store the Base64 string directly
       password: hashedPassword,
     });
 
@@ -37,7 +45,10 @@ export const registerStudent = async (req, res) => {
       .status(201)
       .json({ message: "Student registered successfully", student });
   } catch (error) {
-    res.status(500).json({ message: "Error registering student", error });
+    console.error("Error registering student:", error); // Log the full error
+    res
+      .status(500)
+      .json({ message: "Error registering student", error: error.message });
   }
 };
 

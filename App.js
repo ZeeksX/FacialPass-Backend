@@ -1,3 +1,4 @@
+//App.js
 import express from "express";
 import cors from "cors";
 import dotenv, { configDotenv } from "dotenv";
@@ -7,7 +8,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import path from "path";
-import fs from "fs";
+
 
 configDotenv();
 const app = express();
