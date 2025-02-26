@@ -18,7 +18,7 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configure multer for file uploads
+// ✅ Correct storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir); // Save files to 'uploads' directory
@@ -29,7 +29,7 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter to accept only images
+// ✅ Ensure fileFilter is used properly
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
@@ -39,17 +39,17 @@ const fileFilter = (req, file, cb) => {
 };
 
 const upload = multer({
-  storage: multer.memoryStorage(), // Store file in memory as a buffer
-  fileFilter, // Only accept image files
-  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+  storage: multer,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-// Student Registration & Login
-router.post("/register", upload.single("facial_image"), registerStudent); // Handle file upload
+// ✅ Route for Student Registration (with file upload)
+router.post("/register", upload.single("facial_image"), registerStudent);
 router.post("/login", loginStudent);
 
-// Student Dashboard
-router.get("/me", authMiddleware, getStudentDetails); // Get student info (protected)
-router.post("/register-courses", authMiddleware, registerCourses); // Register for semester courses
+// ✅ Protected Routes
+router.get("/me", authMiddleware, getStudentDetails);
+router.post("/register-courses", authMiddleware, registerCourses);
 
 export default router;

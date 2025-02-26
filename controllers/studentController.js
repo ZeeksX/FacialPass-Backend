@@ -8,8 +8,8 @@ dotenv.config();
 
 // Register a new student with file upload
 export const registerStudent = async (req, res) => {
-  console.log(req.body); // Log the body to see what is being received
-  console.log(req.file); // Log the file to see if it is being received
+  console.log(req.body); // Log body
+  console.log(req.file); // Log file object to confirm it's being received
 
   try {
     const { firstname, lastname, department, matricNumber, email, password } =
@@ -24,11 +24,8 @@ export const registerStudent = async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Convert the uploaded file to Base64
-    let facialImageBase64 = null;
-    if (req.file) {
-      facialImageBase64 = req.file.buffer.toString("base64"); // Convert file buffer to Base64
-    }
+    // Extract only the file name
+    const facialImageName = req.file ? req.file.filename : null;
 
     // Create student
     const student = await Student.create({
@@ -37,7 +34,7 @@ export const registerStudent = async (req, res) => {
       matricNumber,
       department,
       email,
-      facial_image: facialImageBase64, // Store the Base64 string
+      facial_image: facialImageName, // Save only file name
       password: hashedPassword,
     });
 
@@ -45,7 +42,7 @@ export const registerStudent = async (req, res) => {
       .status(201)
       .json({ message: "Student registered successfully", student });
   } catch (error) {
-    console.error("Error registering student:", error); // Log the full error
+    console.error("Error registering student:", error);
     res
       .status(500)
       .json({ message: "Error registering student", error: error.message });
