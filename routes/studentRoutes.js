@@ -39,9 +39,9 @@ const fileFilter = (req, file, cb) => {
 };
 
 const upload = multer({
-  storage: multer,
-  fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  storage, 
+  fileFilter, // Only accept image files
+  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
 });
 
 // ✅ Route for Student Registration (with file upload)
