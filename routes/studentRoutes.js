@@ -24,8 +24,20 @@ const storage = multer.diskStorage({
     cb(null, uploadDir); // Save files to 'uploads' directory
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, `${uniqueSuffix}-${file.originalname}`); // Unique filename
+    // Extract firstname and lastname from the request body
+    const { firstname, lastname } = req.body;
+
+    // Ensure both firstname and lastname are provided
+    if (!firstname || !lastname) {
+      return cb(new Error("Firstname and lastname are required for the filename."), false);
+    }
+
+    // Get the file extension
+    const fileExtension = path.extname(file.originalname);
+    
+    // Create a unique filename
+    const uniqueFilename = `${firstname}-${lastname}${fileExtension}`;
+    cb(null, uniqueFilename); // Use the new filename format
   },
 });
 
