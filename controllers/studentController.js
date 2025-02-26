@@ -10,16 +10,10 @@ dotenv.config();
 export const registerStudent = async (req, res) => {
   console.log(req.body); // Log the body to see what is being received
   console.log(req.file); // Log the file to see if it is being received
+
   try {
-    const {
-      firstname,
-      lastname,
-      department,
-      matricNumber,
-      email,
-      password,
-      facial_image, // Ensure this is being correctly parsed from req.body
-    } = req.body;
+    const { firstname, lastname, department, matricNumber, email, password } =
+      req.body;
 
     // Check if student exists
     const existingStudent = await Student.findOne({ where: { matricNumber } });
@@ -30,6 +24,12 @@ export const registerStudent = async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Convert the uploaded file to Base64
+    let facialImageBase64 = null;
+    if (req.file) {
+      facialImageBase64 = req.file.buffer.toString("base64"); // Convert file buffer to Base64
+    }
+
     // Create student
     const student = await Student.create({
       firstname,
@@ -37,7 +37,7 @@ export const registerStudent = async (req, res) => {
       matricNumber,
       department,
       email,
-      facial_image, // Store the Base64 string directly
+      facial_image: facialImageBase64, // Store the Base64 string
       password: hashedPassword,
     });
 
