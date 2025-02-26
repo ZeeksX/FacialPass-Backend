@@ -18,18 +18,30 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configure multer for file uploads
+// ✅ Correct storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir); // Save files to 'uploads' directory
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, `${uniqueSuffix}-${file.originalname}`); // Unique filename
+    // Extract firstname and lastname from the request body
+    const { firstname, lastname } = req.body;
+
+    // Ensure both firstname and lastname are provided
+    if (!firstname || !lastname) {
+      return cb(new Error("Firstname and lastname are required for the filename."), false);
+    }
+
+    // Get the file extension
+    const fileExtension = path.extname(file.originalname);
+    
+    // Create a unique filename
+    const uniqueFilename = `${firstname}-${lastname}${fileExtension}`;
+    cb(null, uniqueFilename); // Use the new filename format
   },
 });
 
-// File filter to accept only images
+// ✅ Ensure fileFilter is used properly
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
@@ -44,12 +56,12 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
 });
 
-// Student Registration & Login
-router.post("/register", upload.single("facial_image"), registerStudent); // Handle file upload
+// ✅ Route for Student Registration (with file upload)
+router.post("/register", upload.single("facial_image"), registerStudent);
 router.post("/login", loginStudent);
 
-// Student Dashboard
-router.get("/me", authMiddleware, getStudentDetails); // Get student info (protected)
-router.post("/register-courses", authMiddleware, registerCourses); // Register for semester courses
+// ✅ Protected Routes
+router.get("/me", authMiddleware, getStudentDetails);
+router.post("/register-courses", authMiddleware, registerCourses);
 
 export default router;
