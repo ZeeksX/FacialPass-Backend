@@ -5,22 +5,19 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// Register a new student
+// Register a new student with file upload
 export const registerStudent = async (req, res) => {
   try {
-    const {
-      firstname,
-      lastname,
-      matricNumber,
-      email,
-      password,
-      facial_image
-    } = req.body;
+    const { firstname, lastname, department, matricNumber, email, password } =
+      req.body;
+
+    const facial_image = req.file; // Access the uploaded file
 
     // Check if student exists
     const existingStudent = await Student.findOne({ where: { matricNumber } });
-    if (existingStudent)
+    if (existingStudent) {
       return res.status(400).json({ message: "Student already exists" });
+    }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -32,6 +29,7 @@ export const registerStudent = async (req, res) => {
       matricNumber,
       department,
       email,
+      facial_image: facial_image ? facial_image.filename : null, // Save only the filename
       password: hashedPassword,
     });
 
@@ -52,8 +50,9 @@ export const loginStudent = async (req, res) => {
     if (!student) return res.status(404).json({ message: "Student not found" });
 
     const isMatch = await bcrypt.compare(password, student.password);
-    if (!isMatch)
+    if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
+    }
 
     const token = jwt.sign(
       { id: student.id, role: "student" },
@@ -87,8 +86,9 @@ export const registerCourses = async (req, res) => {
     const studentId = req.user.id;
 
     const courses = await Course.findAll({ where: { id: courseIds } });
-    if (courses.length !== courseIds.length)
+    if (courses.length !== courseIds.length) {
       return res.status(400).json({ message: "Invalid course selection" });
+    }
 
     await StudentCourse.bulkCreate(
       courseIds.map((courseId) => ({ studentId, courseId }))
