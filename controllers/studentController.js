@@ -75,14 +75,53 @@ export const loginStudent = async (req, res) => {
 };
 
 // Get student dashboard info
+// export const getStudentDetails = async (req, res) => {
+//   try {
+//     const student = await Student.findByPk(req.user.id, { include: [Course] });
+//     if (!student) return res.status(404).json({ message: "Student not found" });
+
+//     const totalCourses = student.Courses.length;
+//     res.json({ student, totalCourses });
+//   } catch (error) {
+//     res.status(500).json({ message: "Error fetching student details", error });
+//   }
+// };
 export const getStudentDetails = async (req, res) => {
   try {
-    const student = await Student.findByPk(req.user.id, { include: [Course] });
-    if (!student) return res.status(404).json({ message: "Student not found" });
+    const student = await Student.findByPk(req.user.id, {
+      include: [
+        {
+          model: Course,
+          attributes: [
+            "id",
+            "course_name",
+            "course_code",
+            "semester",
+            "credit_unit",
+            "examDate",
+          ],
+          through: { attributes: [] }, // Exclude join table attributes
+        },
+      ],
+    });
 
-    const totalCourses = student.Courses.length;
-    res.json({ student, totalCourses });
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    res.json({
+      student: {
+        firstname: student.firstname,
+        lastname: student.lastname,
+        matricNumber: student.matricNumber,
+        department: student.department,
+        email: student.email,
+      },
+      courses: student.Courses, // Includes exam dates now!
+      totalCourses: student.Courses.length,
+    });
   } catch (error) {
+    console.error("Error fetching student details:", error);
     res.status(500).json({ message: "Error fetching student details", error });
   }
 };
