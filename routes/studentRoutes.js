@@ -7,6 +7,7 @@ import {
   loginStudent,
   getStudentDetails,
   registerCourses,
+  getCourses,
 } from "../controllers/studentController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 
@@ -29,12 +30,15 @@ const storage = multer.diskStorage({
 
     // Ensure both firstname and lastname are provided
     if (!firstname || !lastname) {
-      return cb(new Error("Firstname and lastname are required for the filename."), false);
+      return cb(
+        new Error("Firstname and lastname are required for the filename."),
+        false
+      );
     }
 
     // Get the file extension
     const fileExtension = path.extname(file.originalname);
-    
+
     // Create a unique filename
     const uniqueFilename = `${firstname}-${lastname}${fileExtension}`;
     cb(null, uniqueFilename); // Use the new filename format
@@ -51,7 +55,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 const upload = multer({
-  storage, 
+  storage,
   fileFilter, // Only accept image files
   limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
 });
@@ -63,5 +67,6 @@ router.post("/login", loginStudent);
 // ✅ Protected Routes
 router.get("/me", authMiddleware, getStudentDetails);
 router.post("/register-courses", authMiddleware, registerCourses);
+router.get("/get-courses", authMiddleware, getCourses);
 
 export default router;

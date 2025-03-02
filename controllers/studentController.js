@@ -134,3 +134,13 @@ export const registerCourses = async (req, res) => {
     res.status(500).json({ message: "Error registering courses", error });
   }
 };
+
+export const getCourses = async (req, res) => {
+  try {
+    const courses = await Course.findAll({ include: [Student] });
+    res.json(courses);
+  } catch (error) {
+    console.error("Error fetching courses:", error);
+    return res.status(500).json({ message: "Error fetching courses", error });
+  }
+};
