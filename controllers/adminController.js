@@ -1,7 +1,7 @@
 // controllers/adminController.js
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { Admin, Student, Course, StudentCourse } from "../models/index.js";
+import { Admin, Student, Course } from "../models/index.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -10,11 +10,13 @@ dotenv.config();
 export const registerAdmin = async (req, res) => {
   try {
     const { firstname, lastname, staff_id, email, office, password } = req.body;
-    // Check if admin already exists by email or staff_id
-    const existingAdminByEmail = await Admin.findOne({ where: { email } });
-    const existingAdminByStaffId = await Admin.findOne({ where: { staff_id } });
 
-    if (existingAdminByEmail || existingAdminByStaffId) {
+    // Check if admin already exists by email or staff_id
+    const existingAdmin = await Admin.findOne({
+      where: { [Op.or]: [{ email }, { staff_id }] },
+    });
+
+    if (existingAdmin) {
       return res.status(400).json({ message: "Admin already exists" });
     }
 
@@ -34,7 +36,8 @@ export const registerAdmin = async (req, res) => {
 
     res.status(201).json({ message: "Admin registered successfully", admin });
   } catch (error) {
-    res.status(500).json({ message: "Error registering admin", error });
+    console.error("Error registering admin:", error);
+    return res.status(500).json({ message: "Error registering admin", error });
   }
 };
 
@@ -62,7 +65,8 @@ export const loginAdmin = async (req, res) => {
     // Return success response
     res.json({ message: "Login successful", token, admin });
   } catch (error) {
-    res.status(500).json({ message: "Error logging in", error });
+    console.error("Error logging in admin:", error);
+    return res.status(500).json({ message: "Error logging in", error });
   }
 };
 
@@ -73,7 +77,8 @@ export const getDashboardStats = async (req, res) => {
     const totalCourses = await Course.count();
     res.json({ totalStudents, totalCourses });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching stats", error });
+    console.error("Error fetching dashboard stats:", error);
+    return res.status(500).json({ message: "Error fetching stats", error });
   }
 };
 
@@ -83,7 +88,8 @@ export const getStudents = async (req, res) => {
     const students = await Student.findAll();
     res.json(students);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching students", error });
+    console.error("Error fetching students:", error);
+    return res.status(500).json({ message: "Error fetching students", error });
   }
 };
 
@@ -93,6 +99,32 @@ export const getCourses = async (req, res) => {
     const courses = await Course.findAll({ include: [Student] });
     res.json(courses);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching courses", error });
+    console.error("Error fetching courses:", error);
+    return res.status(500).json({ message: "Error fetching courses", error });
   }
 };
+
+// Get admin details
+export const getAdminDetails = async (req, res) => {
+  try {
+    const admin = await Admin.findByPk(req.user.id);
+
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    res.json({
+      admin: {
+        firstname: admin.firstname,
+        lastname: admin.lastname,
+        office: admin.office,
+        staff_id: admin.staff_id,
+        email: admin.email,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching admin details:", error);
+    return res.status(500).json({ message: "Error fetching admin details", error });
+  }
+};
+

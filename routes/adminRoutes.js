@@ -5,6 +5,7 @@ import {
   getStudents,
   getCourses,
   registerAdmin,
+  getAdminDetails,
 } from "../controllers/adminController.js";
 import { Admin } from "../models/index.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
@@ -41,6 +42,7 @@ router.get("/next-staff-id", async (req, res) => {
 router.post("/register", registerAdmin);
 // Admin Dashboard (Protected)
 router.get("/dashboard", authMiddleware, getDashboardStats);
+router.get("/me", authMiddleware, getAdminDetails);
 router.get("/students", authMiddleware, getStudents);
 router.get("/courses", authMiddleware, getCourses);
 
