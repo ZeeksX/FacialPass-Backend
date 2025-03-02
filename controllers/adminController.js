@@ -28,8 +28,8 @@ export const registerAdmin = async (req, res) => {
       staff_id,
       email,
       office,
-      password_hash: hashedPassword, // Use the correct field name from the model
-      role: "admin", // Explicitly set the role (though it defaults to "admin")
+      password: hashedPassword,
+      role: "admin",
     });
 
     res.status(201).json({ message: "Admin registered successfully", admin });
@@ -48,7 +48,7 @@ export const loginAdmin = async (req, res) => {
     if (!admin) return res.status(404).json({ message: "Admin not found" });
 
     // Compare passwords
-    const isMatch = await bcrypt.compare(password, admin.password_hash);
+    const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch)
       return res.status(401).json({ message: "Invalid credentials" });
 

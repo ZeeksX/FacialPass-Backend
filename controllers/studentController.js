@@ -74,18 +74,6 @@ export const loginStudent = async (req, res) => {
   }
 };
 
-// Get student dashboard info
-// export const getStudentDetails = async (req, res) => {
-//   try {
-//     const student = await Student.findByPk(req.user.id, { include: [Course] });
-//     if (!student) return res.status(404).json({ message: "Student not found" });
-
-//     const totalCourses = student.Courses.length;
-//     res.json({ student, totalCourses });
-//   } catch (error) {
-//     res.status(500).json({ message: "Error fetching student details", error });
-//   }
-// };
 export const getStudentDetails = async (req, res) => {
   try {
     const student = await Student.findByPk(req.user.id, {

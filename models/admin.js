@@ -7,7 +7,7 @@ export default (sequelize, DataTypes) => {
       staff_id: { type: DataTypes.STRING, unique: true },
       office: DataTypes.STRING,
       email: { type: DataTypes.STRING, unique: true },
-      password_hash: DataTypes.TEXT,
+      password: DataTypes.TEXT,
       role: {
         type: DataTypes.STRING,
         defaultValue: "admin",

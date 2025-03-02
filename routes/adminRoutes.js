@@ -4,6 +4,7 @@ import {
   getDashboardStats,
   getStudents,
   getCourses,
+  registerAdmin,
 } from "../controllers/adminController.js";
 import { Admin } from "../models/index.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
@@ -12,10 +13,10 @@ const router = express.Router();
 
 // Admin Login
 router.post("/login", loginAdmin);
-// Example route to fetch the next staff_id
 
+// Route to fetch the next staff_id
 router.get("/next-staff-id", async (req, res) => {
-  console.log("Fetching next staff ID..."); // Debugging
+  console.log("Fetching next staff ID...");
   try {
     const lastAdmin = await Admin.findOne({
       order: [["createdAt", "DESC"]],
@@ -37,6 +38,7 @@ router.get("/next-staff-id", async (req, res) => {
   }
 });
 
+router.post("/register", registerAdmin);
 // Admin Dashboard (Protected)
 router.get("/dashboard", authMiddleware, getDashboardStats);
 router.get("/students", authMiddleware, getStudents);
