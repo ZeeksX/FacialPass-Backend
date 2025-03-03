@@ -74,6 +74,37 @@ export const loginStudent = async (req, res) => {
   }
 };
 
+// Register courses for semester
+export const registerCourses = async (req, res) => {
+  try {
+    const { courseIds } = req.body;
+    const studentId = req.user.id;
+
+    const courses = await Course.findAll({ where: { id: courseIds } });
+    if (courses.length !== courseIds.length) {
+      return res.status(400).json({ message: "Invalid course selection" });
+    }
+
+    await StudentCourse.bulkCreate(
+      courseIds.map((courseId) => ({ studentId, courseId }))
+    );
+
+    res.json({ message: "Courses registered successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error registering courses", error });
+  }
+};
+
+export const getCourses = async (req, res) => {
+  try {
+    const courses = await Course.findAll({ include: [Student] });
+    res.json(courses);
+  } catch (error) {
+    console.error("Error fetching courses:", error);
+    return res.status(500).json({ message: "Error fetching courses", error });
+  }
+};
+
 export const getStudentDetails = async (req, res) => {
   try {
     const student = await Student.findByPk(req.user.id, {
@@ -105,7 +136,7 @@ export const getStudentDetails = async (req, res) => {
         department: student.department,
         email: student.email,
       },
-      courses: student.Courses, // Includes exam dates now!
+      courses: student.Courses, // Includes selected courses
       totalCourses: student.Courses.length,
     });
   } catch (error) {
@@ -114,33 +145,54 @@ export const getStudentDetails = async (req, res) => {
   }
 };
 
-// Register courses for semester
-export const registerCourses = async (req, res) => {
+// Add a course to the student's selected courses
+export const selectCourse = async (req, res) => {
   try {
-    const { courseIds } = req.body;
+    const { courseId } = req.body;
     const studentId = req.user.id;
 
-    const courses = await Course.findAll({ where: { id: courseIds } });
-    if (courses.length !== courseIds.length) {
-      return res.status(400).json({ message: "Invalid course selection" });
+    // Check if the course is already selected
+    const existingSelection = await StudentCourse.findOne({
+      where: { student_id: studentId, course_id: courseId }, // Use the correct column names
+    });
+
+    if (existingSelection) {
+      return res.status(400).json({ message: "Course already selected" });
     }
 
-    await StudentCourse.bulkCreate(
-      courseIds.map((courseId) => ({ studentId, courseId }))
-    );
+    // Add the course to the student's selected courses
+    await StudentCourse.create({ student_id: studentId, course_id: courseId }); // Use the correct column names
 
-    res.json({ message: "Courses registered successfully" });
+    res.json({ message: "Course selected successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error registering courses", error });
+    console.error("Error selecting course:", error);
+    res.status(500).json({ message: "Error selecting course", error });
   }
 };
 
-export const getCourses = async (req, res) => {
+// Drops course from the database to your studentController.js
+export const dropCourse = async (req, res) => {
   try {
-    const courses = await Course.findAll({ include: [Student] });
-    res.json(courses);
+    const { courseId } = req.body;
+    const studentId = req.user.id;
+
+    // Delete the course from the StudentCourse table
+    const result = await StudentCourse.destroy({
+      where: {
+        student_id: studentId,
+        course_id: courseId,
+      },
+    });
+
+    if (result === 0) {
+      return res
+        .status(404)
+        .json({ message: "Course not found for this student" });
+    }
+
+    res.json({ message: "Course dropped successfully" });
   } catch (error) {
-    console.error("Error fetching courses:", error);
-    return res.status(500).json({ message: "Error fetching courses", error });
+    console.error("Error dropping course:", error);
+    res.status(500).json({ message: "Error dropping course", error });
   }
 };

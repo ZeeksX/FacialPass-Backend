@@ -8,6 +8,8 @@ import {
   getStudentDetails,
   registerCourses,
   getCourses,
+  selectCourse,
+  dropCourse,
 } from "../controllers/studentController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 
@@ -68,5 +70,7 @@ router.post("/login", loginStudent);
 router.get("/me", authMiddleware, getStudentDetails);
 router.post("/register-courses", authMiddleware, registerCourses);
 router.get("/get-courses", authMiddleware, getCourses);
+router.post("/select-course", authMiddleware, selectCourse); 
+router.delete("/drop-course", authMiddleware, dropCourse);
 
 export default router;
