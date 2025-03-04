@@ -8,7 +8,7 @@ export default (sequelize, DataTypes) => {
       matricNumber: { type: DataTypes.STRING, unique: true },
       department: DataTypes.STRING,
       email: { type: DataTypes.STRING, unique: true },
-      facial_image: DataTypes.TEXT,
+      facial_image: DataTypes.BLOB("long"), // Store image as binary data
       password: DataTypes.TEXT,
       role: {
         type: DataTypes.STRING,

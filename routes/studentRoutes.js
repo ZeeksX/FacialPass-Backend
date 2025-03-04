@@ -1,3 +1,4 @@
+//routes/studentRoutes.js
 import express from "express";
 import multer from "multer";
 import fs from "fs";
@@ -56,8 +57,14 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+// const upload = multer({
+//   storage,
+//   fileFilter, // Only accept image files
+//   limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+// });
+
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(), // Store file in memory as a buffer
   fileFilter, // Only accept image files
   limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
 });
@@ -70,7 +77,7 @@ router.post("/login", loginStudent);
 router.get("/me", authMiddleware, getStudentDetails);
 router.post("/register-courses", authMiddleware, registerCourses);
 router.get("/get-courses", authMiddleware, getCourses);
-router.post("/select-course", authMiddleware, selectCourse); 
+router.post("/select-course", authMiddleware, selectCourse);
 router.delete("/drop-course", authMiddleware, dropCourse);
 
 export default router;

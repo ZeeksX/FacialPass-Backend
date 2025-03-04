@@ -7,9 +7,51 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // Register a new student with file upload
+// export const registerStudent = async (req, res) => {
+//   console.log(req.body); // Log body
+//   console.log(req.file); // Log file object to confirm it's being received
+
+//   try {
+//     const { firstname, lastname, department, matricNumber, email, password } =
+//       req.body;
+
+//     // Check if student exists
+//     const existingStudent = await Student.findOne({ where: { matricNumber } });
+//     if (existingStudent) {
+//       return res.status(400).json({ message: "Student already exists" });
+//     }
+
+//     // Hash password
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     // Extract only the file name
+//     const facialImageName = req.file ? req.file.filename : null;
+
+//     // Create student
+//     const student = await Student.create({
+//       firstname,
+//       lastname,
+//       matricNumber,
+//       department,
+//       email,
+//       facial_image: facialImageName, // Save only file name
+//       password: hashedPassword,
+//     });
+
+//     res
+//       .status(201)
+//       .json({ message: "Student registered successfully", student });
+//   } catch (error) {
+//     console.error("Error registering student:", error);
+//     res
+//       .status(500)
+//       .json({ message: "Error registering student", error: error.message });
+//   }
+// };
+
 export const registerStudent = async (req, res) => {
   console.log(req.body); // Log body
-  console.log(req.file); // Log file object to confirm it's being received
+  console.log(req.file); // Log file object
 
   try {
     const { firstname, lastname, department, matricNumber, email, password } =
@@ -24,8 +66,11 @@ export const registerStudent = async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Extract only the file name
-    const facialImageName = req.file ? req.file.filename : null;
+    // Read image file as binary data
+    let facialImageBuffer = null;
+    if (req.file) {
+      facialImageBuffer = req.file.buffer; // Store image as buffer
+    }
 
     // Create student
     const student = await Student.create({
@@ -34,7 +79,7 @@ export const registerStudent = async (req, res) => {
       matricNumber,
       department,
       email,
-      facial_image: facialImageName, // Save only file name
+      facial_image: facialImageBuffer, // Store binary data
       password: hashedPassword,
     });
 
@@ -105,6 +150,47 @@ export const getCourses = async (req, res) => {
   }
 };
 
+// export const getStudentDetails = async (req, res) => {
+//   try {
+//     const student = await Student.findByPk(req.user.id, {
+//       include: [
+//         {
+//           model: Course,
+//           attributes: [
+//             "id",
+//             "course_name",
+//             "course_code",
+//             "semester",
+//             "credit_unit",
+//             "examDate",
+//           ],
+//           through: { attributes: [] }, // Exclude join table attributes
+//         },
+//       ],
+//     });
+
+//     if (!student) {
+//       return res.status(404).json({ message: "Student not found" });
+//     }
+
+//     res.json({
+//       student: {
+//         firstname: student.firstname,
+//         lastname: student.lastname,
+//         matricNumber: student.matricNumber,
+//         department: student.department,
+//         email: student.email,
+//       },
+//       courses: student.Courses, // Includes selected courses
+//       totalCourses: student.Courses.length,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching student details:", error);
+//     res.status(500).json({ message: "Error fetching student details", error });
+//   }
+// };
+
+// Add a course to the student's selected courses
 export const getStudentDetails = async (req, res) => {
   try {
     const student = await Student.findByPk(req.user.id, {
@@ -119,7 +205,7 @@ export const getStudentDetails = async (req, res) => {
             "credit_unit",
             "examDate",
           ],
-          through: { attributes: [] }, // Exclude join table attributes
+          through: { attributes: [] },
         },
       ],
     });
@@ -128,6 +214,11 @@ export const getStudentDetails = async (req, res) => {
       return res.status(404).json({ message: "Student not found" });
     }
 
+    // Convert binary image data to a Base64 string
+    const facialImageBase64 = student.facial_image
+      ? `data:image/jpeg;base64,${student.facial_image.toString("base64")}`
+      : null;
+
     res.json({
       student: {
         firstname: student.firstname,
@@ -135,8 +226,9 @@ export const getStudentDetails = async (req, res) => {
         matricNumber: student.matricNumber,
         department: student.department,
         email: student.email,
+        facialImage: facialImageBase64, // Send as Base64
       },
-      courses: student.Courses, // Includes selected courses
+      courses: student.Courses,
       totalCourses: student.Courses.length,
     });
   } catch (error) {
@@ -145,7 +237,6 @@ export const getStudentDetails = async (req, res) => {
   }
 };
 
-// Add a course to the student's selected courses
 export const selectCourse = async (req, res) => {
   try {
     const { courseId } = req.body;
