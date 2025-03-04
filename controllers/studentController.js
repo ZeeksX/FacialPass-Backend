@@ -7,52 +7,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // Register a new student with file upload
-// export const registerStudent = async (req, res) => {
-//   console.log(req.body); // Log body
-//   console.log(req.file); // Log file object to confirm it's being received
-
-//   try {
-//     const { firstname, lastname, department, matricNumber, email, password } =
-//       req.body;
-
-//     // Check if student exists
-//     const existingStudent = await Student.findOne({ where: { matricNumber } });
-//     if (existingStudent) {
-//       return res.status(400).json({ message: "Student already exists" });
-//     }
-
-//     // Hash password
-//     const hashedPassword = await bcrypt.hash(password, 10);
-
-//     // Extract only the file name
-//     const facialImageName = req.file ? req.file.filename : null;
-
-//     // Create student
-//     const student = await Student.create({
-//       firstname,
-//       lastname,
-//       matricNumber,
-//       department,
-//       email,
-//       facial_image: facialImageName, // Save only file name
-//       password: hashedPassword,
-//     });
-
-//     res
-//       .status(201)
-//       .json({ message: "Student registered successfully", student });
-//   } catch (error) {
-//     console.error("Error registering student:", error);
-//     res
-//       .status(500)
-//       .json({ message: "Error registering student", error: error.message });
-//   }
-// };
 
 export const registerStudent = async (req, res) => {
-  console.log(req.body); // Log body
-  console.log(req.file); // Log file object
-
   try {
     const { firstname, lastname, department, matricNumber, email, password } =
       req.body;

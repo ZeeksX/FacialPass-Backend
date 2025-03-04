@@ -57,12 +57,6 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// const upload = multer({
-//   storage,
-//   fileFilter, // Only accept image files
-//   limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
-// });
-
 const upload = multer({
   storage: multer.memoryStorage(), // Store file in memory as a buffer
   fileFilter, // Only accept image files
