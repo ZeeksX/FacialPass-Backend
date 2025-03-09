@@ -8,6 +8,9 @@ dotenv.config();
 
 // Register a new student with file upload
 
+import fs from "fs";
+import path from "path";
+
 export const registerStudent = async (req, res) => {
   try {
     const { firstname, lastname, department, matricNumber, email, password } =
@@ -26,6 +29,20 @@ export const registerStudent = async (req, res) => {
     let facialImageBuffer = null;
     if (req.file) {
       facialImageBuffer = req.file.buffer; // Store image as buffer
+
+      // Ensure 'uploads/' directory exists
+      const uploadDir = path.join(process.cwd(), "uploads");
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+
+      // Create a unique filename
+      const fileExtension = path.extname(req.file.originalname);
+      const uniqueFilename = `${firstname}-${lastname}${fileExtension}`;
+      const filePath = path.join(uploadDir, uniqueFilename);
+
+      // Write the buffer to a file in the uploads directory
+      fs.writeFileSync(filePath, facialImageBuffer);
     }
 
     // Create student
