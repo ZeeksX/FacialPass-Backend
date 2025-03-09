@@ -124,7 +124,57 @@ export const getAdminDetails = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching admin details:", error);
-    return res.status(500).json({ message: "Error fetching admin details", error });
+    return res
+      .status(500)
+      .json({ message: "Error fetching admin details", error });
   }
 };
 
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const adminId = req.user?.id;
+
+    // Validate input
+    if (!currentPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: "Both current and new passwords are required" });
+    }
+
+    // Find the admin by ID
+    const admin = await Admin.findByPk(adminId);
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    // Compare the current password with the stored hash
+    const isMatch = await bcrypt.compare(currentPassword, admin.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    // Prevent reusing the same password
+    const isSamePassword = await bcrypt.compare(newPassword, admin.password);
+    if (isSamePassword) {
+      return res
+        .status(400)
+        .json({
+          message: "New password must be different from the current password",
+        });
+    }
+
+    // Hash the new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the admin's password
+    await admin.update({ password: hashedNewPassword });
+
+    res.json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error updating password:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+};

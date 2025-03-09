@@ -6,6 +6,7 @@ import {
   getCourses,
   registerAdmin,
   getAdminDetails,
+  changePassword,
 } from "../controllers/adminController.js";
 import { Admin } from "../models/index.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
@@ -45,5 +46,5 @@ router.get("/dashboard", authMiddleware, getDashboardStats);
 router.get("/me", authMiddleware, getAdminDetails);
 router.get("/students", authMiddleware, getStudents);
 router.get("/courses", authMiddleware, getCourses);
-
+router.put("/change-password", authMiddleware, changePassword);
 export default router;
