@@ -1,11 +1,15 @@
 import express from "express";
 import jwt from "jsonwebtoken";
+import fs from "fs";
+import path from "path";
 import {
   loginStudent,
   registerStudent,
 } from "../controllers/studentController.js";
 import { loginAdmin } from "../controllers/adminController.js";
 import dotenv from "dotenv";
+import { verifyStudent } from "../controllers/authController.js";
+
 
 dotenv.config(); // Load environment variables from .env file
 const router = express.Router();
@@ -37,6 +41,28 @@ router.post("/validate-token", (req, res) => {
     res.status(401).json({ message: "Invalid token" });
   }
 });
+
+//get known faces in the backend
+router.get("/known-faces", (req, res) => {
+  const uploadsDir = path.join(process.cwd(), "uploads");
+  const files = fs.readdirSync(uploadsDir);
+
+  const knownFaces = files
+    .filter((file) => file.endsWith(".jpg") || file.endsWith(".jpeg"))
+    .map((file) => {
+      const filePath = path.join(uploadsDir, file);
+      const imageBuffer = fs.readFileSync(filePath);
+      return {
+        name: file.split(".")[0], // Use filename as the name (e.g., matricNumber)
+        image: imageBuffer.toString("base64"), // Convert image to base64
+      };
+    });
+
+  res.json(knownFaces);
+});
+
+// authenticate students for exams
+router.post("/authenticate", verifyStudent);
 
 // Admin Authentication
 router.post("/admin/login", loginAdmin);
