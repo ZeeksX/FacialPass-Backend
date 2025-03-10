@@ -1,6 +1,6 @@
 //controllers/authController.js
-import { Student, Course } from "../models/index.js";
-import ExamAuthentication from "../models/examAuthentication.js";
+import { Student, Course, ExamAuthentication } from "../models/index.js";
+
 // Verify student details
 export const verifyStudent = async (req, res) => {
   try {

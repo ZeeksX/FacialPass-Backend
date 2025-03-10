@@ -1,3 +1,4 @@
+//models/examAuthentication.js
 export default (sequelize, DataTypes) => {
   const ExamAuthentication = sequelize.define(
     "ExamAuthentication",
@@ -22,8 +23,7 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.TIME,
         allowNull: false,
       },
-    },
-    { timestamps: true }
+    }
   );
 
   return ExamAuthentication;

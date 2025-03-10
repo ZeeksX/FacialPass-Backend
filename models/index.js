@@ -1,7 +1,6 @@
 //models/index.js
 import { Sequelize, DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
-
 import createStudentModel from "./student.js";
 import createAdminModel from "./admin.js";
 import createDepartmentModel from "./department.js";
@@ -16,10 +15,7 @@ const Admin = createAdminModel(sequelize, DataTypes);
 const Department = createDepartmentModel(sequelize, DataTypes);
 const Course = createCourseModel(sequelize, DataTypes);
 const StudentCourse = createStudentCourseModel(sequelize, DataTypes);
-const SemesterRegistration = createSemesterRegistrationModel(
-  sequelize,
-  DataTypes
-);
+const SemesterRegistration = createSemesterRegistrationModel(sequelize, DataTypes);
 const ExamAuthentication = createExamAuthenticationModel(sequelize, DataTypes);
 
 // Define relationships
