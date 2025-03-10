@@ -1,6 +1,6 @@
 //controllers/authController.js
 import { Student, Course } from "../models/index.js";
-
+import ExamAuthentication from "../models/examAuthentication.js";
 // Verify student details
 export const verifyStudent = async (req, res) => {
   try {
@@ -39,5 +39,38 @@ export const verifyStudent = async (req, res) => {
     return res
       .status(500)
       .json({ success: false, message: "Authentication error" });
+  }
+};
+
+// Save authentication details
+export const saveAuthenticationDetails = async (req, res) => {
+  try {
+    const { matricNumber, courseCode, courseName } = req.body;
+
+    // Get current date and time
+    const now = new Date();
+    const date = now.toISOString().split("T")[0]; // Format: YYYY-MM-DD
+    const time = now.toTimeString().split(" ")[0]; // Format: HH:MM:SS
+
+    // Create a new record in the ExamAuthentication table
+    const authRecord = await ExamAuthentication.create({
+      matricNumber,
+      courseCode,
+      courseName,
+      date,
+      time,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Authentication details saved successfully",
+      data: authRecord,
+    });
+  } catch (error) {
+    console.error("Error saving authentication details:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to save authentication details",
+    });
   }
 };

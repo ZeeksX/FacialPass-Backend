@@ -8,8 +8,10 @@ import {
 } from "../controllers/studentController.js";
 import { loginAdmin } from "../controllers/adminController.js";
 import dotenv from "dotenv";
-import { verifyStudent } from "../controllers/authController.js";
-
+import {
+  saveAuthenticationDetails,
+  verifyStudent,
+} from "../controllers/authController.js";
 
 dotenv.config(); // Load environment variables from .env file
 const router = express.Router();
@@ -63,6 +65,9 @@ router.get("/known-faces", (req, res) => {
 
 // authenticate students for exams
 router.post("/authenticate", verifyStudent);
+
+//post authenticated details to the db
+router.post("/save-authentication", saveAuthenticationDetails);
 
 // Admin Authentication
 router.post("/admin/login", loginAdmin);
