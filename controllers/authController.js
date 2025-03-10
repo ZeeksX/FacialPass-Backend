@@ -6,26 +6,38 @@ export const verifyStudent = async (req, res) => {
   try {
     const { firstname, lastname, courseId } = req.body;
 
-    // Check if the student exists and is registered for the course
+    // Find student
     const student = await Student.findOne({
       where: { firstname, lastname },
       include: [
         {
           model: Course,
-          through: { where: { course_id: courseId } },
+          through: { attributes: [] }, // Hide join table data
         },
       ],
     });
 
     if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    // Check if student is registered for the course
+    const isRegistered = student.Courses.some((course) => course.id === courseId);
+
+    if (!isRegistered) {
       return res.status(403).json({
         success: false,
+        isRegistered: false,
         message: "Student is not registered for this course",
       });
     }
 
     return res.json({
       success: true,
+      isRegistered: true,
       message: `Authenticated: ${student.firstname} ${student.lastname}`,
       student: {
         firstname: student.firstname,
@@ -36,9 +48,10 @@ export const verifyStudent = async (req, res) => {
     });
   } catch (error) {
     console.error("Error authenticating student:", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Authentication error" });
+    return res.status(500).json({
+      success: false,
+      message: "Authentication error",
+    });
   }
 };
 
@@ -49,8 +62,18 @@ export const saveAuthenticationDetails = async (req, res) => {
 
     // Get current date and time
     const now = new Date();
-    const date = now.toISOString().split("T")[0]; // Format: YYYY-MM-DD
-    const time = now.toTimeString().split(" ")[0]; // Format: HH:MM:SS
+    const date = now.toISOString().split("T")[0]; // YYYY-MM-DD
+    const time = now.toTimeString().split(" ")[0]; // HH:MM:SS
+
+    // Ensure student exists before saving authentication details
+    const student = await Student.findOne({ where: { matricNumber } });
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
 
     // Create a new record in the ExamAuthentication table
     const authRecord = await ExamAuthentication.create({
