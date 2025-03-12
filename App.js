@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "http://localhost:5173", // Change this to your frontend URL on Render
+    origin: "http://localhost:5173, https://facialpass.onrender.com/", // Change this to your frontend URL on Render
     credentials: true,
   })
 );
