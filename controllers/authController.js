@@ -58,7 +58,7 @@ export const verifyStudent = async (req, res) => {
 // Save authentication details
 export const saveAuthenticationDetails = async (req, res) => {
   try {
-    const { matricNumber, courseCode, courseName } = req.body;
+    const { matricNumber, courseCode, courseName, firstname, lastname } = req.body;
 
     // Get current date and time
     const now = new Date();
@@ -79,6 +79,7 @@ export const saveAuthenticationDetails = async (req, res) => {
     const authRecord = await ExamAuthentication.create({
       matricNumber,
       courseCode,
+      fullname: `${firstname} ${lastname}`,
       courseName,
       date,
       time,
