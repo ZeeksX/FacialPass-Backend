@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Admin, Student, Course } from "../models/index.js";
 import dotenv from "dotenv";
-
+import { Op } from "sequelize";
 dotenv.config();
 
 // Register a new admin
