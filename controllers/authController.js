@@ -60,11 +60,6 @@ export const saveAuthenticationDetails = async (req, res) => {
   try {
     const { matricNumber, courseCode, courseName, firstname, lastname } = req.body;
 
-    // Get current date and time
-    const now = new Date();
-    const date = now.toISOString().split("T")[0]; // YYYY-MM-DD
-    const time = now.toTimeString().split(" ")[0]; // HH:MM:SS
-
     // Ensure student exists before saving authentication details
     const student = await Student.findOne({ where: { matricNumber } });
 
@@ -74,6 +69,23 @@ export const saveAuthenticationDetails = async (req, res) => {
         message: "Student not found",
       });
     }
+
+    // Check if the student is already authenticated for this course
+    const existingAuthRecord = await ExamAuthentication.findOne({
+      where: { matricNumber, courseCode },
+    });
+
+    if (existingAuthRecord) {
+      return res.status(409).json({
+        success: false,
+        message: "Student has already been authenticated for this course",
+      });
+    }
+
+    // Get current date and time
+    const now = new Date();
+    const date = now.toISOString().split("T")[0]; // YYYY-MM-DD
+    const time = now.toTimeString().split(" ")[0]; // HH:MM:SS
 
     // Create a new record in the ExamAuthentication table
     const authRecord = await ExamAuthentication.create({
