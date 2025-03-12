@@ -1,16 +1,16 @@
-//App.js
+//app.js
 import express from "express";
 import cors from "cors";
-import dotenv, { configDotenv } from "dotenv";
+import dotenv from "dotenv";
 import { sequelize } from "./models/index.js";
 import studentRoutes from "./routes/studentRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import path from "path";
+import { fileURLToPath } from "url";
 
-
-configDotenv();
+dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5173", // Change this to your frontend URL on Render
     credentials: true,
   })
 );
@@ -29,8 +29,9 @@ app.get("/", (req, res) => {
   res.send("Welcome to the FacialPass Backend API!");
 });
 
-// Use import.meta.url to get the directory name
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+// Fix __dirname for ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const uploadsDir = path.join(__dirname, "uploads");
 app.use("/uploads", express.static(uploadsDir));
 
@@ -40,9 +41,9 @@ app.use("/api/admins", adminRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/auth", authRoutes);
 
-// Sync database
+// Sync database and start server
 sequelize
-  .sync({ alter: true })
+  .sync({ alter: true }) // Sync database tables
   .then(() => {
     console.log("Database synchronized successfully.");
     app.listen(PORT, () => {
