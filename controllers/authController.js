@@ -79,7 +79,7 @@ export const saveAuthenticationDetails = async (req, res) => {
     const authRecord = await ExamAuthentication.create({
       matricNumber,
       courseCode,
-      fullname: `${firstname} ${lastname}`,
+      studentName: `${firstname} ${lastname}`,
       courseName,
       date,
       time,
