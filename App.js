@@ -13,13 +13,20 @@ import { fileURLToPath } from "url";
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
+const allowedOrigins = ["http://localhost:5173", "https://facialpass.onrender.com"];
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "http://localhost:5173, https://facialpass.onrender.com/", // Change this to your frontend URL on Render
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, origin);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
