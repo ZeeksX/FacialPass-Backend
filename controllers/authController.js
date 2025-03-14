@@ -60,7 +60,7 @@ export const verifyStudent = async (req, res) => {
 // Save authentication details
 export const saveAuthenticationDetails = async (req, res) => {
   try {
-    const { matricNumber, courseCode, courseName, imageData } = req.body;
+    const { matricNumber, courseCode, courseName, imageData, firstname, lastname } = req.body;
 
     // Ensure student exists before saving authentication details
     const student = await Student.findOne({ where: { matricNumber } });

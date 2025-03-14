@@ -113,6 +113,12 @@ export const getAdminDetails = async (req, res) => {
       return res.status(404).json({ message: "Admin not found" });
     }
 
+    // Fetch all students
+    const allStudents = await Student.findAll();
+
+    // Fetch all courses
+    const allCourses = await Course.findAll({ include: [Student] });
+
     res.json({
       admin: {
         firstname: admin.firstname,
@@ -121,6 +127,8 @@ export const getAdminDetails = async (req, res) => {
         staff_id: admin.staff_id,
         email: admin.email,
       },
+      allStudents, // Include all students in the response
+      allCourses, // Include all courses in the response
     });
   } catch (error) {
     console.error("Error fetching admin details:", error);
@@ -157,11 +165,9 @@ export const changePassword = async (req, res) => {
     // Prevent reusing the same password
     const isSamePassword = await bcrypt.compare(newPassword, admin.password);
     if (isSamePassword) {
-      return res
-        .status(400)
-        .json({
-          message: "New password must be different from the current password",
-        });
+      return res.status(400).json({
+        message: "New password must be different from the current password",
+      });
     }
 
     // Hash the new password
