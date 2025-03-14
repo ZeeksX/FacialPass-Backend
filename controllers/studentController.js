@@ -151,7 +151,7 @@ export const getStudentDetails = async (req, res) => {
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
-
+    const allCourses = await Course.findAll();
     // Convert binary image data to Base64 string
     const facialImageBase64 = student.facial_image
       ? `data:image/jpeg;base64,${student.facial_image.toString("base64")}`
@@ -180,9 +180,9 @@ export const getStudentDetails = async (req, res) => {
         email: student.email,
         facialImage: facialImageBase64, // Send as Base64
       },
-      courses: student.Courses, // Registered courses
-      totalCourses: student.Courses.length,
+      registeredCourses: student.Courses, // Registered courses
       takenCourses: takenCoursesWithBase64, // List of courses with base64 images
+      allCourses: allCourses,
     });
   } catch (error) {
     console.error("Error fetching student details:", error);
