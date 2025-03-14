@@ -1,7 +1,5 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import fs from "fs";
-import path from "path";
 import {
   loginStudent,
   registerStudent,
@@ -12,6 +10,7 @@ import {
   saveAuthenticationDetails,
   verifyStudent,
 } from "../controllers/authController.js";
+import sequelize from "../config/database.js"; // Import the Sequelize instance
 
 dotenv.config(); // Load environment variables from .env file
 const router = express.Router();
@@ -44,29 +43,36 @@ router.post("/validate-token", (req, res) => {
   }
 });
 
-//get known faces in the backend
-router.get("/known-faces", (req, res) => {
-  const uploadsDir = path.join(process.cwd(), "uploads");
-  const files = fs.readdirSync(uploadsDir);
+// Get known faces in the backend
+router.get("/known-faces", async (req, res) => {
+  try {
+    const query = `
+      SELECT firstname, lastname, facial_image
+      FROM "Students";
+    `;
 
-  const knownFaces = files
-    .filter((file) => file.endsWith(".jpg") || file.endsWith(".jpeg"))
-    .map((file) => {
-      const filePath = path.join(uploadsDir, file);
-      const imageBuffer = fs.readFileSync(filePath);
+    const [results] = await sequelize.query(query);
+
+    // Map the results to the desired format
+    const knownFaces = results.map((row) => {
       return {
-        name: file.split(".")[0], // Use filename as the name (e.g., matricNumber)
-        image: imageBuffer.toString("base64"), // Convert image to base64
+        name: `${row.firstname} ${row.lastname}`, 
+        image: row.facial_image.toString("base64"), 
       };
     });
 
-  res.json(knownFaces);
+    // Return the data as JSON
+    res.json(knownFaces);
+  } catch (error) {
+    console.error("Error fetching known faces:", error);
+    res.status(500).json({ error: "Failed to fetch known faces" });
+  }
 });
 
-// authenticate students for exams
+// Authenticate students for exams
 router.post("/authenticate", verifyStudent);
 
-//post authenticated details to the db
+// Post authenticated details to the db
 router.post("/save-authentication", saveAuthenticationDetails);
 
 // Admin Authentication
