@@ -1,7 +1,12 @@
 //controllers/studentController.js
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { Student, Course, StudentCourse } from "../models/index.js";
+import {
+  Student,
+  Course,
+  StudentCourse,
+  ExamAuthentication,
+} from "../models/index.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -187,10 +192,24 @@ export const getStudentDetails = async (req, res) => {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    // Convert binary image data to a Base64 string
+    // Convert binary image data to Base64 string
     const facialImageBase64 = student.facial_image
       ? `data:image/jpeg;base64,${student.facial_image.toString("base64")}`
       : null;
+
+    // Fetch authenticated (taken) courses from ExamAuthentication table
+    const takenCourses = await ExamAuthentication.findAll({
+      where: { matricNumber: student.matricNumber },
+      attributes: ["courseCode", "courseName", "date", "time", "facial_image"],
+    });
+
+    // Convert facial_image buffers to base64 strings in takenCourses
+    const takenCoursesWithBase64 = takenCourses.map((course) => ({
+      ...course.toJSON(),
+      facial_image: course.facial_image
+        ? `data:image/jpeg;base64,${course.facial_image.toString("base64")}`
+        : null,
+    }));
 
     res.json({
       student: {
@@ -201,8 +220,9 @@ export const getStudentDetails = async (req, res) => {
         email: student.email,
         facialImage: facialImageBase64, // Send as Base64
       },
-      courses: student.Courses,
+      courses: student.Courses, // Registered courses
       totalCourses: student.Courses.length,
+      takenCourses: takenCoursesWithBase64, // List of courses with base64 images
     });
   } catch (error) {
     console.error("Error fetching student details:", error);
