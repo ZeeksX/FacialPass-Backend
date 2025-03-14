@@ -128,46 +128,6 @@ export const getCourses = async (req, res) => {
   }
 };
 
-// export const getStudentDetails = async (req, res) => {
-//   try {
-//     const student = await Student.findByPk(req.user.id, {
-//       include: [
-//         {
-//           model: Course,
-//           attributes: [
-//             "id",
-//             "course_name",
-//             "course_code",
-//             "semester",
-//             "credit_unit",
-//             "examDate",
-//           ],
-//           through: { attributes: [] }, // Exclude join table attributes
-//         },
-//       ],
-//     });
-
-//     if (!student) {
-//       return res.status(404).json({ message: "Student not found" });
-//     }
-
-//     res.json({
-//       student: {
-//         firstname: student.firstname,
-//         lastname: student.lastname,
-//         matricNumber: student.matricNumber,
-//         department: student.department,
-//         email: student.email,
-//       },
-//       courses: student.Courses, // Includes selected courses
-//       totalCourses: student.Courses.length,
-//     });
-//   } catch (error) {
-//     console.error("Error fetching student details:", error);
-//     res.status(500).json({ message: "Error fetching student details", error });
-//   }
-// };
-
 // Add a course to the student's selected courses
 export const getStudentDetails = async (req, res) => {
   try {
