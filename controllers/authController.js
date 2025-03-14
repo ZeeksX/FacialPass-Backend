@@ -25,7 +25,9 @@ export const verifyStudent = async (req, res) => {
     }
 
     // Check if student is registered for the course
-    const isRegistered = student.Courses.some((course) => course.id === courseId);
+    const isRegistered = student.Courses.some(
+      (course) => course.id === courseId
+    );
 
     if (!isRegistered) {
       return res.status(403).json({
@@ -58,7 +60,7 @@ export const verifyStudent = async (req, res) => {
 // Save authentication details
 export const saveAuthenticationDetails = async (req, res) => {
   try {
-    const { matricNumber, courseCode, courseName, firstname, lastname } = req.body;
+    const { matricNumber, courseCode, courseName, imageData } = req.body;
 
     // Ensure student exists before saving authentication details
     const student = await Student.findOne({ where: { matricNumber } });
@@ -87,12 +89,21 @@ export const saveAuthenticationDetails = async (req, res) => {
     const date = now.toISOString().split("T")[0]; // YYYY-MM-DD
     const time = now.toTimeString().split(" ")[0]; // HH:MM:SS
 
+    // Ensure imageData is a base64 string
+    if (!imageData || typeof imageData !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid image data. Expected a base64 string.",
+      });
+    }
+
     // Create a new record in the ExamAuthentication table
     const authRecord = await ExamAuthentication.create({
       matricNumber,
       courseCode,
       studentName: `${student.firstname} ${student.lastname}`,
       courseName,
+      facial_image: imageData, // Save the base64 string directly
       date,
       time,
     });
@@ -100,7 +111,7 @@ export const saveAuthenticationDetails = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Authentication details saved successfully",
-      data: authRecord,
+      data: authRecord.toJSON(), // Return the saved record
     });
   } catch (error) {
     console.error("Error saving authentication details:", error);

@@ -17,6 +17,7 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    facial_image: DataTypes.BLOB("long"),
     date: {
       type: DataTypes.DATEONLY,
       allowNull: false,
