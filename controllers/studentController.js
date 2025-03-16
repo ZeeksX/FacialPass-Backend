@@ -6,6 +6,7 @@ import {
   Course,
   StudentCourse,
   ExamAuthentication,
+  Department,
 } from "../models/index.js";
 import dotenv from "dotenv";
 
@@ -268,5 +269,20 @@ export const changePassword = async (req, res) => {
   } catch (error) {
     console.error("Error updating password:", error);
     res.status(500).json({ message: "Error updating password", error });
+  }
+};
+
+//get all departments
+export const getAllDepartments = async (req, res) => {
+  try {
+    const departments = await Department.findAll({
+      attributes: ["id", "name"], // Adjust attributes based on your model
+      order: [["name", "ASC"]],
+    });
+
+    return res.status(200).json({ success: true, data: departments });
+  } catch (error) {
+    console.error("Error fetching departments:", error);
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
