@@ -31,16 +31,20 @@ app.use(
   })
 );
 
+// Fix __dirname for ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static files from 'public/assets'
+app.use("/assets", express.static(path.join(__dirname, "public/assets")));
+
+const uploadsDir = path.join(__dirname, "uploads");
+app.use("/uploads", express.static(uploadsDir));
+
 // Root route
 app.get("/", (req, res) => {
   res.send("Welcome to the FacialPass Backend API!");
 });
-
-// Fix __dirname for ES module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const uploadsDir = path.join(__dirname, "uploads");
-app.use("/uploads", express.static(uploadsDir));
 
 // Routes
 app.use("/api/students", studentRoutes);
