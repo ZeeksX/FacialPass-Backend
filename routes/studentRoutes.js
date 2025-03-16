@@ -73,7 +73,7 @@ router.post("/login", loginStudent);
 router.get("/me", authMiddleware, getStudentDetails);
 router.post("/register-courses", authMiddleware, registerCourses);
 router.get("/get-courses", authMiddleware, getCourses);
-router.get("/get-departments", authMiddleware, getAllDepartments);
+router.get("/get-departments", getAllDepartments);
 router.post("/select-course", authMiddleware, selectCourse);
 router.delete("/drop-course", authMiddleware, dropCourse);
 router.put("/change-password", authMiddleware, changePassword);
