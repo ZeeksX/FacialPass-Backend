@@ -13,7 +13,12 @@ import { fileURLToPath } from "url";
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
-const allowedOrigins = ["http://localhost:5173", "https://facialpass.onrender.com"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://facialpass.onrender.com",
+  "https://facial-pass.vercel.app",
+  "https://facialpass-production.up.railway.app",
+];
 
 // Middleware
 app.use(express.json());
