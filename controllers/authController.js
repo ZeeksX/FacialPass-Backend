@@ -113,13 +113,16 @@ export const saveAuthenticationDetails = async (req, res) => {
       });
     }
 
+    // Convert base64 image data to a buffer
+    const imageBuffer = Buffer.from(imageData, "base64");
+
     // Create a new record in the ExamAuthentication table
     const authRecord = await ExamAuthentication.create({
       matricNumber,
       courseCode,
       studentName: `${student.firstname} ${student.lastname}`,
       courseName,
-      facial_image: imageData, // Save the base64 string directly
+      facial_image: imageBuffer, // Save the buffer directly
       date,
       time,
     });
