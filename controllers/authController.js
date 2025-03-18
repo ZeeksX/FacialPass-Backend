@@ -140,3 +140,32 @@ export const saveAuthenticationDetails = async (req, res) => {
     });
   }
 };
+
+//get all authentications
+export const getAllAuthentications = async (req, res) => {
+  try {
+    // Fetch all authentication records from the database
+    const authentications = await ExamAuthentication.findAll();
+
+    // If no records are found, return a 404 response
+    if (!authentications || authentications.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No authentication records found",
+      });
+    }
+
+    // Return the authentication records
+    res.status(200).json({
+      success: true,
+      message: "Authentication records retrieved successfully",
+      data: authentications,
+    });
+  } catch (error) {
+    console.error("Error fetching authentication records:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch authentication records",
+    });
+  }
+};
