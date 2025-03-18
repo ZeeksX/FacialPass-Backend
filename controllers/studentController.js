@@ -168,7 +168,9 @@ export const getStudentDetails = async (req, res) => {
     // Since facial_image is already a base64 string, no conversion is needed
     const takenCoursesWithBase64 = takenCourses.map((course) => ({
       ...course.toJSON(),
-      facial_image: course.facial_image, // Use the existing base64 string
+      facial_image: course.facial_image
+        ? `data:image/jpeg;base64,${course.facial_image.toString("base64")}`
+        : null,
     }));
 
     res.json({
@@ -178,7 +180,7 @@ export const getStudentDetails = async (req, res) => {
         matricNumber: student.matricNumber,
         department: student.department,
         email: student.email,
-        facialImage: facialImageBase64, 
+        facialImage: facialImageBase64,
       },
       registeredCourses: student.Courses, // Registered courses
       takenCourses: takenCoursesWithBase64, // List of courses with base64 images
