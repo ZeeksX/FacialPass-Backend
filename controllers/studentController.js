@@ -169,10 +169,8 @@ export const getStudentDetails = async (req, res) => {
     const takenCoursesWithBase64 = takenCourses.map((course) => ({
       ...course.toJSON(),
       facial_image: course.facial_image
-        ? `data:image/jpeg;base64,${Buffer.from(course.facial_image.data).toString("base64")}`
-        : null,
     }));
-    
+
     res.json({
       student: {
         firstname: student.firstname,
