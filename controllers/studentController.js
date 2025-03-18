@@ -155,6 +155,10 @@ export const getStudentDetails = async (req, res) => {
 
     const allCourses = await Course.findAll();
 
+    const facialImageBase64 = student.facial_image
+      ? `data:image/jpeg;base64,${student.facial_image.toString("base64")}`
+      : null;
+
     // Fetch authenticated (taken) courses from ExamAuthentication table
     const takenCourses = await ExamAuthentication.findAll({
       where: { matricNumber: student.matricNumber },
@@ -174,7 +178,7 @@ export const getStudentDetails = async (req, res) => {
         matricNumber: student.matricNumber,
         department: student.department,
         email: student.email,
-        facialImage: student.facial_image, // Send as Base64 (already in base64 format)
+        facialImage: facialImageBase64, 
       },
       registeredCourses: student.Courses, // Registered courses
       takenCourses: takenCoursesWithBase64, // List of courses with base64 images
