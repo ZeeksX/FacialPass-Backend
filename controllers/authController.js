@@ -60,7 +60,6 @@ export const verifyStudent = async (req, res) => {
 // Save authentication details
 export const saveAuthenticationDetails = async (req, res) => {
   try {
-    console.log("Request Body:", req.body); // Log the request body
     const {
       matricNumber,
       courseCode,

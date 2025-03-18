@@ -44,7 +44,7 @@ router.get("/next-staff-id", async (req, res) => {
 router.post("/register", registerAdmin);
 // Admin Dashboard (Protected)
 router.get("/dashboard", authMiddleware, getDashboardStats);
-router.get("/get-authentications", getAllAuthentications);
+router.get("/get-authentications", authMiddleware, getAllAuthentications);
 router.get("/me", authMiddleware, getAdminDetails);
 router.get("/students", authMiddleware, getStudents);
 router.get("/courses", authMiddleware, getCourses);
