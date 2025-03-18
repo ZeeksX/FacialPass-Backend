@@ -152,11 +152,8 @@ export const getStudentDetails = async (req, res) => {
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
+
     const allCourses = await Course.findAll();
-    // Convert binary image data to Base64 string
-    const facialImageBase64 = student.facial_image
-      ? `data:image/jpeg;base64,${student.facial_image.toString("base64")}`
-      : null;
 
     // Fetch authenticated (taken) courses from ExamAuthentication table
     const takenCourses = await ExamAuthentication.findAll({
@@ -164,12 +161,10 @@ export const getStudentDetails = async (req, res) => {
       attributes: ["courseCode", "courseName", "date", "time", "facial_image"],
     });
 
-    // Convert facial_image buffers to base64 strings in takenCourses
+    // Since facial_image is already a base64 string, no conversion is needed
     const takenCoursesWithBase64 = takenCourses.map((course) => ({
       ...course.toJSON(),
-      facial_image: course.facial_image
-        ? `data:image/jpeg;base64,${course.facial_image.toString("base64")}`
-        : null,
+      facial_image: course.facial_image, // Use the existing base64 string
     }));
 
     res.json({
@@ -179,7 +174,7 @@ export const getStudentDetails = async (req, res) => {
         matricNumber: student.matricNumber,
         department: student.department,
         email: student.email,
-        facialImage: facialImageBase64, // Send as Base64
+        facialImage: student.facial_image, // Send as Base64 (already in base64 format)
       },
       registeredCourses: student.Courses, // Registered courses
       takenCourses: takenCoursesWithBase64, // List of courses with base64 images
@@ -283,6 +278,8 @@ export const getAllDepartments = async (req, res) => {
     return res.status(200).json({ success: true, data: departments });
   } catch (error) {
     console.error("Error fetching departments:", error);
-    return res.status(500).json({ success: false, message: "Internal Server Error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
   }
 };
